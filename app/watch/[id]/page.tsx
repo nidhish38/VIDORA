@@ -1,0 +1,190 @@
+
+"use client";
+
+import { Suspense, useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+type Video = {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  video_url: string;
+  thumbnail_url: string | null;
+  duration_seconds: number | null;
+  created_at: string;
+};
+
+function WatchPageContent() {
+  const params = useParams<{ id: string }>();
+  const router = useRouter();
+  const [supabase] = useState(() => createClient());
+  const [video, setVideo] = useState<Video | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Load the selected video
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadVideo() {
+      setLoading(true);
+      setError("");
+
+      const { data, error } = await supabase
+        .from("videos")
+        .select("*")
+        .eq("id", params.id)
+        .single();
+
+      if (cancelled) return;
+
+      if (error || !data) {
+        setError("Video not found or unable to load it.");
+        setVideo(null);
+      } else {
+        setVideo(data as Video);
+      }
+
+      setLoading(false);
+    }
+
+    if (params.id) {
+      loadVideo();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [params.id]);
+
+  // Stop video and sound when leaving this page
+  useEffect(() => {
+    return () => {
+      const players = document.querySelectorAll("video");
+
+      players.forEach((player) => {
+        player.pause();
+        player.removeAttribute("src");
+        player.load();
+      });
+    };
+  }, []);
+
+  return (
+    <main className="min-h-screen w-full overflow-x-hidden bg-[#0b0718] p-4 text-white sm:p-5 md:p-10">
+      <div className="mx-auto w-full max-w-5xl">
+        <button
+          type="button"
+          onClick={() => router.push("/")}
+          className="mb-6 inline-flex min-h-11 items-center text-violet-300 hover:text-violet-200"
+        >
+          ← Back to VIDORA
+        </button>
+
+        {loading ? (
+          <div className="py-20 text-center text-gray-400">
+            Loading video...
+          </div>
+        ) : error || !video ? (
+          <div className="rounded-2xl border border-white/10 p-8 text-center">
+            <h1 className="text-xl font-bold">
+              Unable to load video
+            </h1>
+
+            <p className="mt-3 text-gray-400">
+              {error || "This video could not be found."}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              className="mt-5 rounded-xl bg-violet-600 px-5 py-3 font-semibold hover:bg-violet-500"
+            >
+              Back to homepage
+            </button>
+          </div>
+        ) : (
+          <>
+         
+              {/* Adsterra banner placeholder */}
+              <div className="mb-5 flex min-h-[90px] w-full flex-col items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center">
+                <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">
+                  Advertisement
+                </p>
+                <p className="mt-2 text-sm text-gray-400">
+                  Adsterra banner will appear here
+                </p>
+              </div>
+
+              {/* Video player */}
+              <div className="w-full overflow-hidden rounded-2xl bg-black">
+                <video
+                  className="block aspect-video w-full bg-black object-contain"
+                  src={video.video_url}
+                  controls
+                  playsInline
+                  preload="metadata"
+                >
+                  Your browser does not support HTML video.
+                </video>
+              </div>
+
+              {/* Second Adsterra banner placeholder */}
+              <div className="mt-5 flex min-h-[90px] w-full flex-col items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center">
+                <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">
+                  Advertisement
+                </p>
+                <p className="mt-2 text-sm text-gray-400">
+                  Adsterra banner will appear here
+                </p>
+              </div>
+            {/* Video details */}
+            <div className="mt-5 min-w-0">
+              <h1 className="break-words text-2xl font-bold leading-tight sm:text-3xl">
+                {video.title}
+              </h1>
+
+              <p className="mt-3 inline-block rounded-full bg-violet-500/15 px-3 py-1 text-sm font-medium text-violet-300">
+                {video.category || "Other"}
+              </p>
+
+              <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <h2 className="mb-2 text-sm font-semibold text-gray-200">
+                  About this video
+                </h2>
+
+                <p className="whitespace-pre-wrap break-words text-sm leading-6 text-gray-300">
+                  {video.description || "No description provided."}
+                </p>
+              </div>
+
+              {/* Download button */}             
+                <a
+                  href={`/download-ad/${video.id}`}
+                  className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl bg-violet-600 px-5 py-3 text-center font-semibold transition hover:bg-violet-500 sm:w-fit"
+                >
+                  ↓ Download video
+                </a>
+            </div>
+          </>
+        )}
+      </div>
+    </main>
+  );
+}
+
+export default function WatchPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#0b0718] p-8 text-center text-white">
+          Loading video...
+        </main>
+      }
+    >
+      <WatchPageContent />
+    </Suspense>
+  );
+}

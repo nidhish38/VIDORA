@@ -4,6 +4,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Script from "next/script";
 
 type Video = {
   id: string;
@@ -106,16 +107,29 @@ function WatchPageContent() {
             </button>
           </div>
         ) : (
-          <>
-         
-              {/* Adsterra banner placeholder */}
-              <div className="mb-5 flex min-h-[90px] w-full flex-col items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center">
-                <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">
-                  Advertisement
-                </p>
-                <p className="mt-2 text-sm text-gray-400">
-                  Adsterra banner will appear here
-                </p>
+          <>             
+              <div className="mb-5 flex min-h-[90px] w-full items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+                <div id="vidora-adsterra-banner" className="flex min-h-[90px] w-full items-center justify-center">
+                  <Script
+                    id="vidora-adsterra-options"
+                    strategy="afterInteractive"
+                    dangerouslySetInnerHTML={{
+                      __html: `
+                        atOptions = {
+                          'key': '95a40d08b0cea3823586748d937434b0',
+                          'format': 'iframe',
+                          'height': 90,
+                          'width': 728,
+                          'params': {}
+                        };
+                      `,
+                    }}
+                  />
+                  <Script
+                    id="vidora-adsterra-loader"
+                    strategy="afterInteractive"
+                    src="https://bancadeltempoidea.org/22/95a40d08b0cea3823586748d937434b0"/>
+                </div>
               </div>
 
               {/* Video player */}

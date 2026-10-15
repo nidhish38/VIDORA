@@ -4,7 +4,6 @@
 import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import Script from "next/script";
 
 type Video = {
   id: string;
@@ -17,6 +16,85 @@ type Video = {
   created_at: string;
 };
 
+// First banner: 728 x 90
+function AdsterraBanner() {
+  useEffect(() => {
+    const container = document.getElementById("adsterra-banner");
+    if (!container) return;
+
+    const options = {
+      key: "95a40d08b0cea3823586748d937434b0",
+      format: "iframe",
+      height: 90,
+      width: 728,
+      params: {},
+    };
+
+    const config = document.createElement("script");
+    config.text = `var atOptions = ${JSON.stringify(options)};`;
+
+    const adScript = document.createElement("script");
+    adScript.src =
+      "https://bancadeltempoidea.org/22/95a40d08b0cea3823586748d937434b0";
+    adScript.async = true;
+
+    container.replaceChildren(config, adScript);
+
+    return () => {
+      container.replaceChildren();
+    };
+  }, []);
+
+  return (
+    <div className="mb-5 flex min-h-[90px] w-full items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+      <div
+        id="adsterra-banner"
+        className="flex min-h-[90px] w-full items-center justify-center"
+      />
+    </div>
+  );
+}
+
+// Second banner: 300 x 250
+function AdsterraSecondBanner() {
+  useEffect(() => {
+    const container = document.getElementById(
+      "adsterra-second-banner"
+    );
+    if (!container) return;
+
+    const options = {
+      key: "e5eb904545f82316ce8dbb02c607def6",
+      format: "iframe",
+      height: 250,
+      width: 300,
+      params: {},
+    };
+
+    const config = document.createElement("script");
+    config.text = `var atOptions = ${JSON.stringify(options)};`;
+
+    const adScript = document.createElement("script");
+    adScript.src = "https://bancadeltempoidea.org/22/e5eb904545f82316ce8dbb02c607def6";
+    adScript.async = true;
+
+    container.replaceChildren(config, adScript);
+
+    return () => {
+      container.replaceChildren();
+    };
+  }, []);
+
+  return (
+    <div className="mt-5 flex min-h-[250px] w-full justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+      <div
+        id="adsterra-second-banner"
+        className="flex min-h-[250px] w-[300px] max-w-full items-center justify-center"
+      />
+    </div>
+  );
+}
+
 function WatchPageContent() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -25,7 +103,6 @@ function WatchPageContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Load the selected video
   useEffect(() => {
     let cancelled = false;
 
@@ -58,14 +135,11 @@ function WatchPageContent() {
     return () => {
       cancelled = true;
     };
-  }, [params.id]);
+  }, [params.id, supabase]);
 
-  // Stop video and sound when leaving this page
   useEffect(() => {
     return () => {
-      const players = document.querySelectorAll("video");
-
-      players.forEach((player) => {
+      document.querySelectorAll("video").forEach((player) => {
         player.pause();
         player.removeAttribute("src");
         player.load();
@@ -93,11 +167,9 @@ function WatchPageContent() {
             <h1 className="text-xl font-bold">
               Unable to load video
             </h1>
-
             <p className="mt-3 text-gray-400">
               {error || "This video could not be found."}
             </p>
-
             <button
               type="button"
               onClick={() => router.push("/")}
@@ -107,53 +179,26 @@ function WatchPageContent() {
             </button>
           </div>
         ) : (
-          <>             
-              <div className="mb-5 flex min-h-[90px] w-full items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
-                <div id="vidora-adsterra-banner" className="flex min-h-[90px] w-full items-center justify-center">
-                  <Script
-                    id="vidora-adsterra-options"
-                    strategy="afterInteractive"
-                    dangerouslySetInnerHTML={{
-                      __html: `
-                        atOptions = {
-                          'key': '95a40d08b0cea3823586748d937434b0',
-                          'format': 'iframe',
-                          'height': 90,
-                          'width': 728,
-                          'params': {}
-                        };
-                      `,
-                    }}
-                  />
-                  <Script
-                    id="vidora-adsterra-loader"
-                    strategy="afterInteractive"
-                    src="https://bancadeltempoidea.org/22/95a40d08b0cea3823586748d937434b0"/>
-                </div>
-              </div>
+          <>
+            {/* First banner */}
+            <AdsterraBanner />
 
-              {/* Video player */}
-              <div className="w-full overflow-hidden rounded-2xl bg-black">
-                <video
-                  className="block aspect-video w-full bg-black object-contain"
-                  src={video.video_url}
-                  controls
-                  playsInline
-                  preload="metadata"
-                >
-                  Your browser does not support HTML video.
-                </video>
-              </div>
+            {/* Video player */}
+            <div className="w-full overflow-hidden rounded-2xl bg-black">
+              <video
+                className="block aspect-video w-full bg-black object-contain"
+                src={video.video_url}
+                controls
+                playsInline
+                preload="metadata"
+              >
+                Your browser does not support HTML video.
+              </video>
+            </div>
 
-              {/* Second Adsterra banner placeholder */}
-              <div className="mt-5 flex min-h-[90px] w-full flex-col items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center">
-                <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">
-                  Advertisement
-                </p>
-                <p className="mt-2 text-sm text-gray-400">
-                  Adsterra banner will appear here
-                </p>
-              </div>
+            {/* Second banner */}
+            <AdsterraSecondBanner />
+
             {/* Video details */}
             <div className="mt-5 min-w-0">
               <h1 className="break-words text-2xl font-bold leading-tight sm:text-3xl">
@@ -168,19 +213,18 @@ function WatchPageContent() {
                 <h2 className="mb-2 text-sm font-semibold text-gray-200">
                   About this video
                 </h2>
-
                 <p className="whitespace-pre-wrap break-words text-sm leading-6 text-gray-300">
                   {video.description || "No description provided."}
                 </p>
               </div>
 
-              {/* Download button */}             
-                <a
-                  href={`/download-ad/${video.id}`}
-                  className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl bg-violet-600 px-5 py-3 text-center font-semibold transition hover:bg-violet-500 sm:w-fit"
-                >
-                  ↓ Download video
-                </a>
+              {/* Download button */}
+              <a
+                href={`/download-ad/${video.id}`}
+                className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl bg-violet-600 px-5 py-3 text-center font-semibold transition hover:bg-violet-500 sm:w-fit"
+              >
+                ↓ Download video
+              </a>
             </div>
           </>
         )}

@@ -29,6 +29,35 @@ function AdPageContent() {
   };
 }, [videoId]);
 
+  
+  useEffect(() => {
+    const container = document.getElementById("video-click-ad-banner");
+    if (!container) return;
+
+    const options = {
+      key: "95a40d08b0cea3823586748d937434b0",
+      format: "iframe",
+      height: 90,
+      width: 728,
+      params: {},
+    };
+
+    const config = document.createElement("script");
+    config.text = `var atOptions = ${JSON.stringify(options)};`;
+
+    const adScript = document.createElement("script");
+    adScript.src =
+      "https://bancadeltempoidea.org/22/95a40d08b0cea3823586748d937434b0";
+    adScript.async = true;
+
+    container.replaceChildren(config, adScript);
+
+    return () => {
+      container.replaceChildren();
+    };
+  }, []);
+
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#0b0718] p-5 text-white">
       <div className="w-full max-w-2xl text-center">
@@ -43,14 +72,12 @@ function AdPageContent() {
           Advertisement
         </h1>
 
-        <div className="mt-6 flex min-h-64 flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <p className="text-gray-300">
-            Your advertisement will appear here.
-          </p>
-
-          <p className="mt-2 text-sm text-gray-500">
-            Ad code placeholder — not connected yet.
-          </p>
+        <div className="mt-6 flex min-h-[100px] flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+          <p className="mb-2 text-xs text-gray-500">ADVERTISEMENT</p>
+          <div
+            id="video-click-ad-banner"
+            className="flex min-h-[90px] w-full items-center justify-center overflow-x-auto"
+          />
         </div>
 
         <p className="mt-5 text-sm text-gray-300">

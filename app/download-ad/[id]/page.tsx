@@ -59,6 +59,51 @@ function DownloadAdContent() {
     };
   }, [videoId]);
 
+  
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src =
+      "https://aarems.org/1/327f0e2e8afd2c13e04434f20b52f1b7";
+    script.setAttribute("data-cfasync", "false");
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
+  }, []);
+
+  
+  useEffect(() => {
+    const container = document.getElementById(
+      "download-adsterra-banner"
+    );
+    if (!container) return;
+
+    const options = {
+      key: "d5184bd54081ea812f569e3196c70198",
+      format: "iframe",
+      height: 50,
+      width: 320,
+      params: {},
+    };
+
+    const config = document.createElement("script");
+    config.text = `var atOptions = ${JSON.stringify(options)};`;
+
+    const adScript = document.createElement("script");
+    adScript.src =
+      "https://bancadeltempoidea.org/22/d5184bd54081ea812f569e3196c70198";
+    adScript.async = true;
+
+    container.replaceChildren(config, adScript);
+
+    return () => {
+      container.replaceChildren();
+    };
+  }, []);
+
   function downloadVideo() {
     if (!videoUrl) return;
 
@@ -85,17 +130,19 @@ function DownloadAdContent() {
         <h1 className="mt-10 text-3xl font-bold">
           Advertisement
         </h1>
+        
+        <div className="mt-6 flex min-h-[100px] flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+          <p className="mb-2 text-xs text-gray-500">
+            ADVERTISEMENT
+          </p>
 
-        <div className="mt-6 flex min-h-64 flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <p className="text-gray-300">
-            Your download advertisement will appear here.
-          </p>
-          <p className="mt-2 text-sm text-gray-500">
-            Ad code placeholder — not connected yet.
-          </p>
+          <div
+            id="download-adsterra-banner"
+            className="flex min-h-[50px] w-full items-center justify-center overflow-hidden"
+          />
         </div>
 
-        <p className="mt-5 text-sm text-gray-300">
+       <p className="mt-5 text-sm text-gray-300">
           After 2 seconds, click Continue to Download Video.
         </p>
 
